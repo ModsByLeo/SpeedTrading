@@ -36,7 +36,6 @@ public abstract class MixinMerchantScreen_AddButton extends ContainerScreen<Merc
     @Inject(method = "init", at = @At("TAIL"))
     public void speedtrading$initButton(CallbackInfo ci) {
         addButton(speedtrading$button = new SpeedTradingButton(x + 247, y + 37, this));
-        speedtrading$button.updateActiveState();
     }
 
     @Inject(method = "syncRecipeIndex", at = @At("TAIL"))
@@ -46,8 +45,8 @@ public abstract class MixinMerchantScreen_AddButton extends ContainerScreen<Merc
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public boolean isOpen() {
-        return minecraft.currentScreen == this;
+    public boolean isClosed() {
+        return minecraft.currentScreen != this;
     }
 
     @Override
@@ -59,14 +58,19 @@ public abstract class MixinMerchantScreen_AddButton extends ContainerScreen<Merc
     }
 
     @Override
-    public boolean canPerformTrade() {
+    public TradeState getTradeState() {
         TradeOffer offer = getCurrentTradeOffer();
-        if (offer.isDisabled() || !playerCanAcceptStack(playerInventory, offer.getMutableSellItem()))
-            return false;
-        if (container.slots.get(2).hasStack())
-            return true;
-        return playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory,
-                                                                                                  offer.getSecondBuyItem());
+        if (offer == null)
+            return TradeState.NO_SELECTION;
+        if (offer.isDisabled())
+            return TradeState.OUT_OF_STOCK;
+        if (!playerCanAcceptStack(playerInventory, offer.getMutableSellItem()))
+            return TradeState.NO_ROOM_FOR_SELL_ITEM;
+        if (container.slots.get(2).hasStack() ||
+            (playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory,
+                                                                                               offer.getSecondBuyItem())))
+            return TradeState.CAN_PERFORM;
+        return TradeState.NOT_ENOUGH_BUY_ITEMS;
     }
 
     @Override
@@ -83,5 +87,10 @@ public abstract class MixinMerchantScreen_AddButton extends ContainerScreen<Merc
     public void clearTradeSlots() {
         onMouseClick(container.slots.get(0), -1, 0, SlotActionType.QUICK_MOVE);
         onMouseClick(container.slots.get(1), -1, 0, SlotActionType.QUICK_MOVE);
+    }
+
+    @Override
+    public void renderTooltip(String text, int mouseX, int mouseY) {
+        super.renderTooltip(text, mouseX, mouseY);
     }
 }
