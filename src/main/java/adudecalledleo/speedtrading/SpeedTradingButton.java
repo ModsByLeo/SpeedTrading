@@ -4,11 +4,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.village.TradeOffer;
 
 public class SpeedTradingButton extends AbstractPressableButtonWidget {
     private final MerchantScreenAccess msa;
+    private MerchantScreenAccess.TradeState cachedTradeState;
     private boolean trading;
     private boolean refill;
 
@@ -17,11 +18,13 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
         this.msa = msa;
         trading = false;
         refill = false;
+        updateActiveState();
     }
 
     @Override
     public void onPress() {
-        if (msa.canPerformTrade()) {
+        updateActiveState();
+        if (active) {
             SpeedTradingAntiFreezeMeasure.reset();
             trading = true;
             refill = true;
@@ -30,7 +33,7 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
 
     private void performTrade() {
         if (trading) {
-            if (!msa.isOpen()) {
+            if (msa.isClosed()) {
                 trading = false;
                 return;
             }
@@ -40,7 +43,8 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
                 else
                     msa.performTrade();
                 refill = !refill;
-                trading = msa.canPerformTrade();
+                updateActiveState();
+                trading = active;
                 if (!trading) {
                     msa.clearTradeSlots();
                     updateActiveState();
@@ -49,30 +53,33 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
         }
     }
 
-    private static final Identifier BUTTON_LOCATIION = new Identifier(SpeedTradingMod.MOD_ID, "textures/gui/speedtrade.png");
+    private static final Identifier BUTTON_LOCATION = new Identifier(SpeedTradingMod.MOD_ID, "textures/gui/speedtrade.png");
 
     public void updateActiveState() {
-        if (trading)
-            return;
-        TradeOffer offer = msa.getCurrentTradeOffer();
-        if (offer.isDisabled()) {
-            active = false;
-            return;
-        }
-        active = msa.canPerformTrade();
+        active = (cachedTradeState = msa.getTradeState()) == MerchantScreenAccess.TradeState.CAN_PERFORM;
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        if (msa.isClosed())
+            return;
         performTrade();
         MinecraftClient client = MinecraftClient.getInstance();
-        client.getTextureManager().bindTexture(BUTTON_LOCATIION);
+        client.getTextureManager().bindTexture(BUTTON_LOCATION);
         RenderSystem.color4f(1, 1, 1, alpha);
         int i = getYImage(isHovered());
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
         drawTexture(matrices, x, y, getZOffset(), 0, i * 18, 20, 18, 54, 20);
+        if (isHovered())
+            renderToolTip(matrices, mouseX, mouseY);
+    }
+
+    @Override
+    public void renderToolTip(MatrixStack matrices, int mouseX, int mouseY) {
+        msa.renderTooltip(matrices, new TranslatableText("speedtrading.tooltip." + cachedTradeState.name().toLowerCase()),
+                          mouseX, mouseY);
     }
 }

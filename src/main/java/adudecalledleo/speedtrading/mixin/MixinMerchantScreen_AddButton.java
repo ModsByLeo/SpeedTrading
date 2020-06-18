@@ -4,8 +4,10 @@ import adudecalledleo.speedtrading.MerchantScreenAccess;
 import adudecalledleo.speedtrading.SpeedTradingButton;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.MerchantScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.Text;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TraderOfferList;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,7 +38,6 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
     @Inject(method = "init", at = @At("TAIL"))
     public void speedtrading$initButton(CallbackInfo ci) {
         addButton(speedtrading$button = new SpeedTradingButton(x + 247, y + 37, this));
-        speedtrading$button.updateActiveState();
     }
 
     @Inject(method = "syncRecipeIndex", at = @At("TAIL"))
@@ -46,8 +47,8 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public boolean isOpen() {
-        return client.currentScreen == this;
+    public boolean isClosed() {
+        return client.currentScreen != this;
     }
 
     @Override
@@ -59,14 +60,19 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
     }
 
     @Override
-    public boolean canPerformTrade() {
+    public TradeState getTradeState() {
         TradeOffer offer = getCurrentTradeOffer();
-        if (offer.isDisabled() || !playerCanAcceptStack(playerInventory, offer.getMutableSellItem()))
-            return false;
-        if (handler.slots.get(2).hasStack())
-            return true;
-        return playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory,
-                                                                                                  offer.getSecondBuyItem());
+        if (offer == null)
+            return TradeState.NO_SELECTION;
+        if (offer.isDisabled())
+            return TradeState.OUT_OF_STOCK;
+        if (!playerCanAcceptStack(playerInventory, offer.getMutableSellItem()))
+            return TradeState.NO_ROOM_FOR_SELL_ITEM;
+        if (handler.slots.get(2).hasStack() ||
+            (playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory,
+                                                                                               offer.getSecondBuyItem())))
+            return TradeState.CAN_PERFORM;
+        return TradeState.NOT_ENOUGH_BUY_ITEMS;
     }
 
     @Override
@@ -83,5 +89,10 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
     public void clearTradeSlots() {
         onMouseClick(handler.slots.get(0), -1, 0, SlotActionType.QUICK_MOVE);
         onMouseClick(handler.slots.get(1), -1, 0, SlotActionType.QUICK_MOVE);
+    }
+
+    @Override
+    public void renderTooltip(MatrixStack matrices, Text text, int mouseX, int mouseY) {
+        super.renderTooltip(matrices, text, mouseX, mouseY);
     }
 }

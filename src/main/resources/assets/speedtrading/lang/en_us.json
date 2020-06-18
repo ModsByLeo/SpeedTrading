@@ -1,0 +1,7 @@
+{
+  "speedtrading.tooltip.can_perform": "Click to speed trade",
+  "speedtrading.tooltip.no_selection": "Select a trade",
+  "speedtrading.tooltip.out_of_stock": "Out of stock!",
+  "speedtrading.tooltip.no_room_for_sell_item": "No room for trade result!",
+  "speedtrading.tooltip.not_enough_buy_items": "Insufficient items for trade!"
+}
