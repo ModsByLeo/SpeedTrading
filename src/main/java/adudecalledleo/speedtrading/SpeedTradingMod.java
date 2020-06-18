@@ -1,6 +1,7 @@
 package adudecalledleo.speedtrading;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.event.client.ClientTickCallback;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
@@ -16,8 +17,8 @@ public class SpeedTradingMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        log(Level.INFO, "Initializing client");
-        // TODO initializer
+        ClientTickCallback.EVENT.register(SpeedTradingAntiFreezeMeasure::onClientTick);
+        log(Level.INFO, "Initialized client");
     }
 
     public static void log(Level level, String message){
@@ -29,6 +30,8 @@ public class SpeedTradingMod implements ClientModInitializer {
     }
 
     public static boolean listContainsStack(DefaultedList<ItemStack> list, ItemStack stack) {
+        if (stack.isEmpty())
+            return true;
         for (ItemStack itemStack : list)
             if (areStacksEqual(itemStack, stack))
                 return true;
@@ -37,5 +40,14 @@ public class SpeedTradingMod implements ClientModInitializer {
 
     public static boolean playerHasStack(PlayerInventory playerInventory, ItemStack stack) {
         return listContainsStack(playerInventory.main, stack);
+    }
+
+    public static boolean playerCanAcceptStack(PlayerInventory playerInventory, ItemStack stack) {
+        if (stack.isEmpty())
+            return false;
+        else if (stack.isDamaged())
+            return playerInventory.getEmptySlot() >= 0;
+        else
+            return playerInventory.getOccupiedSlotWithRoomForStack(stack) >= 0;
     }
 }
