@@ -17,13 +17,13 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
         this.msa = msa;
         trading = false;
         refill = false;
-        updateActiveState();
+        recacheState();
     }
 
     @Override
     public void onPress() {
-        updateActiveState();
-        if (active) {
+        recacheState();
+        if (cachedTradeState == MerchantScreenAccess.TradeState.CAN_PERFORM) {
             SpeedTradingAntiFreezeMeasure.reset();
             trading = true;
             refill = true;
@@ -42,11 +42,11 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
                 else
                     msa.performTrade();
                 refill = !refill;
-                updateActiveState();
-                trading = active;
+                recacheState();
+                trading = cachedTradeState == MerchantScreenAccess.TradeState.CAN_PERFORM;
                 if (!trading) {
                     msa.clearTradeSlots();
-                    updateActiveState();
+                    recacheState();
                 }
             }
         }
@@ -54,23 +54,24 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
 
     private static final Identifier BUTTON_LOCATION = new Identifier(SpeedTradingMod.MOD_ID, "textures/gui/speedtrade.png");
 
-    public void updateActiveState() {
-        active = (cachedTradeState = msa.getTradeState()) == MerchantScreenAccess.TradeState.CAN_PERFORM;
+    public void recacheState() {
+        cachedTradeState = msa.getTradeState();
     }
 
     @Override
     public void renderButton(int mouseX, int mouseY, float delta) {
         if (msa.isClosed())
             return;
+        if (cachedTradeState == MerchantScreenAccess.TradeState.NO_SELECTION)
+            recacheState();
         performTrade();
         MinecraftClient client = MinecraftClient.getInstance();
         client.getTextureManager().bindTexture(BUTTON_LOCATION);
         RenderSystem.color4f(1, 1, 1, alpha);
-        int i = getYImage(isHovered());
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
-        blit(x, y, getBlitOffset(), 0, i * 18, 20, 18, 54, 20);
+        blit(x, y, getBlitOffset(), 0, isHovered() ? 18 : 0, 20, 18, 54, 20);
         if (isHovered())
             renderToolTip(mouseX, mouseY);
     }
