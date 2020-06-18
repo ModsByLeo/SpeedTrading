@@ -1,7 +1,9 @@
 package adudecalledleo.speedtrading.mixin;
 
 import adudecalledleo.speedtrading.MerchantScreenAccess;
-import adudecalledleo.speedtrading.SpeedTradingButton;
+import adudecalledleo.speedtrading.config.ModConfig;
+import adudecalledleo.speedtrading.config.ModConfigHolder;
+import adudecalledleo.speedtrading.gui.SpeedTradingButton;
 import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.container.MerchantContainer;
@@ -35,7 +37,7 @@ public abstract class MixinMerchantScreen_AddButton extends ContainerScreen<Merc
 
     @Inject(method = "init", at = @At("TAIL"))
     public void speedtrading$initButton(CallbackInfo ci) {
-        addButton(speedtrading$button = new SpeedTradingButton(x + 247, y + 37, this));
+        addButton(speedtrading$button = new SpeedTradingButton(x + 247, y + 36, this));
         speedtrading$syncRecipeIndex();
     }
 
@@ -43,6 +45,13 @@ public abstract class MixinMerchantScreen_AddButton extends ContainerScreen<Merc
     public void speedtrading$updateButton(CallbackInfo ci) {
         if (speedtrading$button != null)
             speedtrading$button.recacheState();
+    }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    public void spedtrading$renderButtonTooltip(int mouseX, int mouseY, float delta,
+                                                CallbackInfo ci) {
+        if (speedtrading$button != null)
+            speedtrading$button.renderToolTip(mouseX, mouseY);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -64,11 +73,16 @@ public abstract class MixinMerchantScreen_AddButton extends ContainerScreen<Merc
         TradeOffer offer = getCurrentTradeOffer();
         if (offer == null)
             return TradeState.NO_SELECTION;
+        ItemStack sellItem = offer.getMutableSellItem();
+        final ModConfig.TradeBlockBehavior tradeBlockBehavior = ModConfigHolder.getConfig().tradeBlockBehavior;
+        if (tradeBlockBehavior == ModConfig.TradeBlockBehavior.DAMAGEABLE && sellItem.isDamageable() ||
+            tradeBlockBehavior == ModConfig.TradeBlockBehavior.UNSTACKABLE && !sellItem.isStackable())
+            return TradeState.BLOCKED;
         if (container.slots.get(2).hasStack())
             return TradeState.CAN_PERFORM;
         if (offer.isDisabled())
             return TradeState.OUT_OF_STOCK;
-        if (!playerCanAcceptStack(playerInventory, offer.getMutableSellItem()))
+        if (!playerCanAcceptStack(playerInventory, sellItem))
             return TradeState.NO_ROOM_FOR_SELL_ITEM;
         if (playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory,
                                                                                                offer.getSecondBuyItem()))

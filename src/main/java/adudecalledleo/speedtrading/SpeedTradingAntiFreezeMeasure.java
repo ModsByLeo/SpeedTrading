@@ -10,7 +10,7 @@ public class SpeedTradingAntiFreezeMeasure {
     }
 
     public static int getCounterMax() {
-        return 1; // TODO make this configurable
+        return 1;
     }
 
     public static boolean doAction() {

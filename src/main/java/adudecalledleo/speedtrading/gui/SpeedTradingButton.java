@@ -1,5 +1,8 @@
-package adudecalledleo.speedtrading;
+package adudecalledleo.speedtrading.gui;
 
+import adudecalledleo.speedtrading.MerchantScreenAccess;
+import adudecalledleo.speedtrading.SpeedTradingAntiFreezeMeasure;
+import adudecalledleo.speedtrading.SpeedTradingMod;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
@@ -23,7 +26,7 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
     @Override
     public void onPress() {
         recacheState();
-        if (cachedTradeState == MerchantScreenAccess.TradeState.CAN_PERFORM) {
+        if (!trading && cachedTradeState == MerchantScreenAccess.TradeState.CAN_PERFORM) {
             SpeedTradingAntiFreezeMeasure.reset();
             trading = true;
             refill = true;
@@ -70,16 +73,20 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
         RenderSystem.color4f(1, 1, 1, alpha);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.disableDepthTest();
-        blit(x, y, 0, isHovered() ? 18 : 0, 20, 18, 20, 36);
-        if (isHovered())
-            renderToolTip(mouseX, mouseY);
         RenderSystem.enableDepthTest();
+        int i = isHovered() ? 18 : 0;
+        blit(x, y, 0, trading ? 36 : i, 20, 18, 20, 54);
     }
 
     @Override
-    public void renderToolTip(int mouseX, int mouseY) {
-        msa.renderTooltip(I18n.translate("speedtrading.tooltip." + cachedTradeState.name().toLowerCase()),
-                          mouseX, mouseY);
+    public void renderToolTip(MatrixStack matrices, int mouseX, int mouseY) {
+        if (!isHovered())
+            return;
+        String key;
+        if (trading)
+            key = "speedtrading.tooltip.trading";
+        else
+            key = "speedtrading.tooltip." + cachedTradeState.name().toLowerCase();
+        msa.renderTooltip(key, mouseX, mouseY);
     }
 }
