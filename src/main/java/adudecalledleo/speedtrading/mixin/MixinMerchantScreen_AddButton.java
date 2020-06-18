@@ -2,10 +2,10 @@ package adudecalledleo.speedtrading.mixin;
 
 import adudecalledleo.speedtrading.MerchantScreenAccess;
 import adudecalledleo.speedtrading.SpeedTradingButton;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
-import net.minecraft.screen.MerchantScreenHandler;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.container.MerchantContainer;
+import net.minecraft.container.SlotActionType;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TraderOfferList;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static adudecalledleo.speedtrading.SpeedTradingMod.playerHasStack;
 
 @Mixin(MerchantScreen.class)
-public abstract class MixinMerchantScreen_AddButton extends HandledScreen<MerchantScreenHandler> implements
+public abstract class MixinMerchantScreen_AddButton extends ContainerScreen<MerchantContainer> implements
                                                                                                  MerchantScreenAccess {
     public MixinMerchantScreen_AddButton() {
         super(null, null, null);
@@ -37,7 +37,7 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
 
     @Override
     public TradeOffer getCurrentTradeOffer() {
-        TraderOfferList offers = handler.getRecipes();
+        TraderOfferList offers = container.getRecipes();
         if (selectedIndex < 0 || selectedIndex >= offers.size())
             return null;
         return offers.get(selectedIndex);
@@ -45,7 +45,7 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
 
     @Override
     public boolean canPerformTrade() {
-        if (handler.slots.get(2).hasStack())
+        if (container.slots.get(2).hasStack())
             return true;
         TradeOffer offer = getCurrentTradeOffer();
         return playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory,
@@ -54,7 +54,7 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
 
     @Override
     public void performTrade() {
-        onMouseClick(handler.slots.get(2), -1, 0, SlotActionType.QUICK_MOVE);
+        onMouseClick(container.slots.get(2), -1, 0, SlotActionType.QUICK_MOVE);
         speedtrading$syncRecipeIndex();
     }
 }

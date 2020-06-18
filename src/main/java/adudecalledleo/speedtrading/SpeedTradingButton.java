@@ -3,7 +3,6 @@ package adudecalledleo.speedtrading;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.village.TradeOffer;
 
@@ -32,9 +31,8 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
         active = msa.canPerformTrade();
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void renderButton(int mouseX, int mouseY, float delta) {
         updateActiveState();
         MinecraftClient client = MinecraftClient.getInstance();
         client.getTextureManager().bindTexture(BUTTON_LOCATIION);
@@ -43,6 +41,6 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
-        drawTexture(matrices, x, y, getZOffset(), 0, i * 18, 20, 18, 54, 20);
+        blit(x, y, getBlitOffset(), 0, i * 18, 20, 18, 54, 20);
     }
 }
