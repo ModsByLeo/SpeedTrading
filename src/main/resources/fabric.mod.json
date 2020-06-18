@@ -18,6 +18,9 @@
   "entrypoints": {
     "client": [
       "adudecalledleo.speedtrading.SpeedTradingMod"
+    ],
+    "modmenu": [
+      "adudecalledleo.speedtrading.compat.ModMenuApiImpl"
     ]
   },
   "mixins": [
@@ -26,5 +29,8 @@
   "depends": {
     "fabricloader": ">=0.4.0",
     "fabric": "*"
+  },
+  "custom": {
+    "modmenu:clientsideOnly": true
   }
 }

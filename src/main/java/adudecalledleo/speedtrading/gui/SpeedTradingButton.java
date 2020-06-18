@@ -1,5 +1,8 @@
-package adudecalledleo.speedtrading;
+package adudecalledleo.speedtrading.gui;
 
+import adudecalledleo.speedtrading.MerchantScreenAccess;
+import adudecalledleo.speedtrading.SpeedTradingAntiFreezeMeasure;
+import adudecalledleo.speedtrading.SpeedTradingMod;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
@@ -27,7 +30,7 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
     @Override
     public void onPress() {
         recacheState();
-        if (cachedTradeState == MerchantScreenAccess.TradeState.CAN_PERFORM) {
+        if (!trading && cachedTradeState == MerchantScreenAccess.TradeState.CAN_PERFORM) {
             SpeedTradingAntiFreezeMeasure.reset();
             trading = true;
             refill = true;
@@ -75,16 +78,20 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
         RenderSystem.color4f(1, 1, 1, alpha);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.disableDepthTest();
-        drawTexture(matrices, x, y, 0, isHovered() ? 18 : 0, 20, 18, 20, 36);
-        if (isHovered())
-            renderToolTip(matrices, mouseX, mouseY);
         RenderSystem.enableDepthTest();
+        int i = isHovered() ? 18 : 0;
+        drawTexture(matrices, x, y, 0, trading ? 36 : i, 20, 18, 20, 54);
     }
 
     @Override
     public void renderToolTip(MatrixStack matrices, int mouseX, int mouseY) {
-        msa.renderTooltip(matrices, new TranslatableText("speedtrading.tooltip." + cachedTradeState.name().toLowerCase()),
-                          mouseX, mouseY);
+        if (!isHovered())
+            return;
+        TranslatableText text;
+        if (trading)
+            text = new TranslatableText("speedtrading.tooltip.trading");
+        else
+            text = new TranslatableText("speedtrading.tooltip." + cachedTradeState.name().toLowerCase());
+        msa.renderTooltip(matrices, text, mouseX, mouseY);
     }
 }

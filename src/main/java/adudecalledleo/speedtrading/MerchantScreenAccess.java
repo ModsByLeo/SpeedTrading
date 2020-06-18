@@ -6,7 +6,7 @@ import net.minecraft.village.TradeOffer;
 
 public interface MerchantScreenAccess {
     enum TradeState {
-        CAN_PERFORM, NO_SELECTION, OUT_OF_STOCK, NO_ROOM_FOR_SELL_ITEM, NOT_ENOUGH_BUY_ITEMS
+        CAN_PERFORM, NO_SELECTION, OUT_OF_STOCK, NO_ROOM_FOR_SELL_ITEM, NOT_ENOUGH_BUY_ITEMS, BLOCKED
     }
 
     boolean isClosed();
