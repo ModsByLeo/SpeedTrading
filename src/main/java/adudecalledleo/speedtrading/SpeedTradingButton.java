@@ -75,10 +75,11 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
         RenderSystem.color4f(1, 1, 1, alpha);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.enableDepthTest();
-        drawTexture(matrices, x, y, getZOffset(), 0, isHovered() ? 18 : 0, 20, 18, 36, 20);
+        RenderSystem.disableDepthTest();
+        drawTexture(matrices, x, y, 0, isHovered() ? 18 : 0, 20, 18, 20, 36);
         if (isHovered())
             renderToolTip(matrices, mouseX, mouseY);
+        RenderSystem.enableDepthTest();
     }
 
     @Override
