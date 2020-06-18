@@ -25,17 +25,18 @@ public class SpeedTradingMod implements ClientModInitializer {
         LOGGER.log(level, message);
     }
 
-    public static boolean areStacksEqual(ItemStack a, ItemStack b) {
-        return a.getItem() == b.getItem() && ItemStack.areTagsEqual(a, b) && a.getCount() >= b.getCount();
+    public static boolean areItemsEqual(ItemStack a, ItemStack b) {
+        return a.getItem() == b.getItem() && ItemStack.areTagsEqual(a, b);
     }
 
     public static boolean listContainsStack(DefaultedList<ItemStack> list, ItemStack stack) {
         if (stack.isEmpty())
             return true;
+        int count = 0;
         for (ItemStack itemStack : list)
-            if (areStacksEqual(itemStack, stack))
-                return true;
-        return false;
+            if (areItemsEqual(itemStack, stack))
+                count += itemStack.getCount();
+        return count > stack.getCount();
     }
 
     public static boolean playerHasStack(PlayerInventory playerInventory, ItemStack stack) {
@@ -45,9 +46,9 @@ public class SpeedTradingMod implements ClientModInitializer {
     public static boolean playerCanAcceptStack(PlayerInventory playerInventory, ItemStack stack) {
         if (stack.isEmpty())
             return false;
-        else if (stack.isDamaged())
-            return playerInventory.getEmptySlot() >= 0;
-        else
-            return playerInventory.getOccupiedSlotWithRoomForStack(stack) >= 0;
+        if (!stack.isDamaged())
+            if (playerInventory.getOccupiedSlotWithRoomForStack(stack) >= 0)
+                return true;
+        return playerInventory.getEmptySlot() >= 0;
     }
 }

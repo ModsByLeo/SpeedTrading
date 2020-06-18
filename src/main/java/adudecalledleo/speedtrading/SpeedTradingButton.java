@@ -5,7 +5,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
 import net.minecraft.util.Identifier;
 import net.minecraft.village.TradeOffer;
-import org.apache.logging.log4j.Level;
 
 public class SpeedTradingButton extends AbstractPressableButtonWidget {
     private final MerchantScreenAccess msa;
@@ -22,7 +21,6 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
     @Override
     public void onPress() {
         if (msa.canPerformTrade()) {
-            SpeedTradingMod.log(Level.INFO, "Speed trade button pressed, let's get it on");
             SpeedTradingAntiFreezeMeasure.reset();
             trading = true;
             refill = true;
@@ -42,15 +40,19 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
                     msa.performTrade();
                 refill = !refill;
                 trading = msa.canPerformTrade();
-                if (!trading)
+                if (!trading) {
                     msa.clearTradeSlots();
+                    updateActiveState();
+                }
             }
         }
     }
 
     private static final Identifier BUTTON_LOCATIION = new Identifier(SpeedTradingMod.MOD_ID, "textures/gui/speedtrade.png");
 
-    private void updateActiveState() {
+    public void updateActiveState() {
+        if (trading)
+            return;
         TradeOffer offer = msa.getCurrentTradeOffer();
         if (offer.isDisabled()) {
             active = false;
@@ -62,7 +64,6 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
     @Override
     public void renderButton(int mouseX, int mouseY, float delta) {
         performTrade();
-        updateActiveState();
         MinecraftClient client = MinecraftClient.getInstance();
         client.getTextureManager().bindTexture(BUTTON_LOCATIION);
         RenderSystem.color4f(1, 1, 1, alpha);
