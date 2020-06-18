@@ -2,9 +2,9 @@
   "required": true,
   "package": "adudecalledleo.speedtrading.mixin",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [],
-  "client": [],
-  "server": [],
+  "client": [
+    "MixinMerchantScreen_AddButton"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

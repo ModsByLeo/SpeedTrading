@@ -16,11 +16,9 @@
   "icon": "assets/speedtrading/icon.png",
   "environment": "client",
   "entrypoints": {
-    "main": [],
     "client": [
       "adudecalledleo.speedtrading.SpeedTradingMod"
-    ],
-    "server": []
+    ]
   },
   "mixins": [
     "speedtrading.mixins.json"
