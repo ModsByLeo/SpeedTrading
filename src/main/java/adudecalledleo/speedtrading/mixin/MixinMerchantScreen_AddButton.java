@@ -38,11 +38,13 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
     @Inject(method = "init", at = @At("TAIL"))
     public void speedtrading$initButton(CallbackInfo ci) {
         addButton(speedtrading$button = new SpeedTradingButton(x + 247, y + 37, this));
+        speedtrading$syncRecipeIndex();
     }
 
     @Inject(method = "syncRecipeIndex", at = @At("TAIL"))
     public void speedtrading$updateButton(CallbackInfo ci) {
-        speedtrading$button.updateActiveState();
+        if (speedtrading$button != null)
+            speedtrading$button.recacheState();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -64,13 +66,14 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
         TradeOffer offer = getCurrentTradeOffer();
         if (offer == null)
             return TradeState.NO_SELECTION;
+        if (handler.slots.get(2).hasStack())
+            return TradeState.CAN_PERFORM;
         if (offer.isDisabled())
             return TradeState.OUT_OF_STOCK;
         if (!playerCanAcceptStack(playerInventory, offer.getMutableSellItem()))
             return TradeState.NO_ROOM_FOR_SELL_ITEM;
-        if (handler.slots.get(2).hasStack() ||
-            (playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory,
-                                                                                               offer.getSecondBuyItem())))
+        if (playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory,
+                                                                                               offer.getSecondBuyItem()))
             return TradeState.CAN_PERFORM;
         return TradeState.NOT_ENOUGH_BUY_ITEMS;
     }
