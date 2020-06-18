@@ -10,7 +10,6 @@ import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TraderOfferList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -29,9 +28,20 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
     @SuppressWarnings("FieldMayBeFinal")
     @Shadow private int selectedIndex;
 
+    @Shadow(prefix = "speedtrading$")
+    protected abstract void speedtrading$syncRecipeIndex();
+
+    private SpeedTradingButton speedtrading$button;
+
     @Inject(method = "init", at = @At("TAIL"))
     public void speedtrading$initButton(CallbackInfo ci) {
-        addButton(new SpeedTradingButton(x + 247, y + 37, this));
+        addButton(speedtrading$button = new SpeedTradingButton(x + 247, y + 37, this));
+        speedtrading$button.updateActiveState();
+    }
+
+    @Inject(method = "syncRecipeIndex", at = @At("TAIL"))
+    public void speedtrading$updateButton(CallbackInfo ci) {
+        speedtrading$button.updateActiveState();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -65,8 +75,9 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
     }
 
     @Override
-    @Invoker("syncRecipeIndex")
-    public abstract void refillTradeSlots();
+    public void refillTradeSlots() {
+        speedtrading$syncRecipeIndex();
+    }
 
     @Override
     public void clearTradeSlots() {
