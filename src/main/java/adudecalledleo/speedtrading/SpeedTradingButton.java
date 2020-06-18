@@ -13,7 +13,7 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
     private boolean refill;
 
     public SpeedTradingButton(int x, int y, MerchantScreenAccess msa) {
-        super(x, y, 18, 20, null);
+        super(x, y, 18, 20, "");
         this.msa = msa;
         trading = false;
         refill = false;
