@@ -79,7 +79,7 @@ public class SpeedTradingButton extends AbstractPressableButtonWidget {
     }
 
     @Override
-    public void renderToolTip(MatrixStack matrices, int mouseX, int mouseY) {
+    public void renderToolTip(int mouseX, int mouseY) {
         if (!isHovered())
             return;
         String key;
