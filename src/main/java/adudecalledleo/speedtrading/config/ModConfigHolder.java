@@ -27,7 +27,7 @@ public class ModConfigHolder {
     }
 
     private static final Path CONFIG_PATH = Paths.get(FabricLoader.getInstance().getConfigDirectory().toURI())
-                                                 .resolve("dontdropit.json");
+                                                 .resolve("speedtrading.json");
 
     public static void loadConfig() {
         if (CONFIG_PATH.toFile().exists()) {
