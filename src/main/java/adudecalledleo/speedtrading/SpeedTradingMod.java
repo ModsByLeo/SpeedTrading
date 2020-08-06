@@ -1,24 +1,28 @@
 package adudecalledleo.speedtrading;
 
+import adudecalledleo.lionutils.ConfigHolder;
+import adudecalledleo.lionutils.LoggerUtil;
+import adudecalledleo.speedtrading.config.ModConfig;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.event.client.ClientTickCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.util.collection.DefaultedList;
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class SpeedTradingMod implements ClientModInitializer {
     public static final String MOD_ID = "speedtrading";
     public static final String MOD_NAME = "Speed Trading";
 
-    public static Logger LOGGER = LogManager.getLogger(MOD_NAME);
+    public static final Logger LOGGER = LoggerUtil.getLogger(MOD_NAME);
+    public static final ConfigHolder<ModConfig> CONFIG_HOLDER = ConfigHolder.create(MOD_ID, ModConfig.class,
+            ModConfig::new, ConfigHolder.createExceptionHandler(LOGGER));
 
     @Override
     public void onInitializeClient() {
-        ClientTickCallback.EVENT.register(SpeedTradingAntiFreezeMeasure::onClientTick);
+        ClientTickEvents.END_CLIENT_TICK.register(SpeedTradingAntiFreezeMeasure::onClientTick);
         log(Level.INFO, "Initialized client");
     }
 

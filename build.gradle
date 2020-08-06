@@ -13,6 +13,10 @@ group = project.maven_group
 minecraft {
 }
 
+repositories {
+	maven { url "https://dl.bintray.com/adudecalledleo/mcmods.fabric" }
+}
+
 dependencies {
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -23,6 +27,8 @@ dependencies {
 	modImplementation "me.shedaniel.cloth:config-2:${project.cloth_config_version}"
 	include "me.shedaniel.cloth:config-2:${project.cloth_config_version}"
 	modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
+	modImplementation "adudecalledleo.mcmods.fabric:lionutils:${project.lionutils_version}"
+	include "adudecalledleo.mcmods.fabric:lionutils:${project.lionutils_version}"
 }
 
 processResources {

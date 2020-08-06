@@ -2,7 +2,6 @@ package adudecalledleo.speedtrading.mixin;
 
 import adudecalledleo.speedtrading.MerchantScreenAccess;
 import adudecalledleo.speedtrading.config.ModConfig;
-import adudecalledleo.speedtrading.config.ModConfigHolder;
 import adudecalledleo.speedtrading.gui.SpeedTradingButton;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
@@ -15,12 +14,12 @@ import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TraderOfferList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static adudecalledleo.speedtrading.SpeedTradingMod.playerCanAcceptStack;
-import static adudecalledleo.speedtrading.SpeedTradingMod.playerHasStack;
+import static adudecalledleo.speedtrading.SpeedTradingMod.*;
 
 @Mixin(MerchantScreen.class)
 public abstract class MixinMerchantScreen_AddButton extends HandledScreen<MerchantScreenHandler> implements
@@ -33,28 +32,27 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
     @SuppressWarnings("FieldMayBeFinal")
     @Shadow private int selectedIndex;
 
-    @Shadow(prefix = "speedtrading$")
-    protected abstract void speedtrading$syncRecipeIndex();
+    @Shadow protected abstract void syncRecipeIndex();
 
-    private SpeedTradingButton speedtrading$button;
+    @Unique private SpeedTradingButton button;
 
     @Inject(method = "init", at = @At("TAIL"))
     public void speedtrading$initButton(CallbackInfo ci) {
-        addButton(speedtrading$button = new SpeedTradingButton(x + 247, y + 36, this));
-        speedtrading$syncRecipeIndex();
+        addButton(button = new SpeedTradingButton(x + 247, y + 36, this));
+        syncRecipeIndex();
     }
 
     @Inject(method = "syncRecipeIndex", at = @At("TAIL"))
     public void speedtrading$updateButton(CallbackInfo ci) {
-        if (speedtrading$button != null)
-            speedtrading$button.recacheState();
+        if (button != null)
+            button.recacheState();
     }
 
     @Inject(method = "render", at = @At("TAIL"))
     public void spedtrading$renderButtonTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta,
                                                 CallbackInfo ci) {
-        if (speedtrading$button != null)
-            speedtrading$button.renderToolTip(matrices, mouseX, mouseY);
+        if (button != null)
+            button.renderToolTip(matrices, mouseX, mouseY);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -77,7 +75,7 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
         if (offer == null)
             return TradeState.NO_SELECTION;
         ItemStack sellItem = offer.getMutableSellItem();
-        final ModConfig.TradeBlockBehavior tradeBlockBehavior = ModConfigHolder.getConfig().tradeBlockBehavior;
+        final ModConfig.TradeBlockBehavior tradeBlockBehavior = CONFIG_HOLDER.get().tradeBlockBehavior;
         if (tradeBlockBehavior == ModConfig.TradeBlockBehavior.DAMAGEABLE && sellItem.isDamageable() ||
             tradeBlockBehavior == ModConfig.TradeBlockBehavior.UNSTACKABLE && !sellItem.isStackable())
             return TradeState.BLOCKED;
@@ -87,8 +85,8 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
             return TradeState.OUT_OF_STOCK;
         if (!playerCanAcceptStack(playerInventory, sellItem))
             return TradeState.NO_ROOM_FOR_SELL_ITEM;
-        if (playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory,
-                                                                                               offer.getSecondBuyItem()))
+        if (playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem())
+                && playerHasStack(playerInventory, offer.getSecondBuyItem()))
             return TradeState.CAN_PERFORM;
         return TradeState.NOT_ENOUGH_BUY_ITEMS;
     }
@@ -100,7 +98,7 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
 
     @Override
     public void refillTradeSlots() {
-        speedtrading$syncRecipeIndex();
+        syncRecipeIndex();
     }
 
     @Override
