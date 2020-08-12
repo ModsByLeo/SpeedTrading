@@ -1,6 +1,6 @@
 {
   "speedtrading.tooltip.can_perform": "Click to speed trade",
-  "speedtrading.tooltip.no_selection": "Select a trade",
+  "speedtrading.tooltip.no_selection": "Select a trade!",
   "speedtrading.tooltip.out_of_stock": "Out of stock!",
   "speedtrading.tooltip.no_room_for_sell_item": "No room for trade result!",
   "speedtrading.tooltip.not_enough_buy_items": "Insufficient items for trade!",
@@ -14,5 +14,8 @@
   "speedtrading.config.trade_block_behavior.tooltip": "Controls when to not allow speed trading.",
   "speedtrading.config.trade_block_behavior.damageable": "Result is Damageable",
   "speedtrading.config.trade_block_behavior.unstackable": "Result is Unstackable",
-  "speedtrading.config.trade_block_behavior.disabled": "Disabled"
+  "speedtrading.config.trade_block_behavior.disabled": "Disabled",
+  "speedtrading.config.current_trade.is": "Current trade is:",
+  "speedtrading.config.current_trade.and": "and ",
+  "speedtrading.config.current_trade.for": "for "
 }

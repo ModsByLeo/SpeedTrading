@@ -9,7 +9,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.MerchantScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.Text;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TraderOfferList;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +38,6 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
     @Inject(method = "init", at = @At("TAIL"))
     public void speedtrading$initButton(CallbackInfo ci) {
         addButton(button = new SpeedTradingButton(x + 247, y + 36, this));
-        syncRecipeIndex();
     }
 
     @Inject(method = "syncRecipeIndex", at = @At("TAIL"))
@@ -105,10 +103,5 @@ public abstract class MixinMerchantScreen_AddButton extends HandledScreen<Mercha
     public void clearTradeSlots() {
         onMouseClick(handler.slots.get(0), -1, 0, SlotActionType.QUICK_MOVE);
         onMouseClick(handler.slots.get(1), -1, 0, SlotActionType.QUICK_MOVE);
-    }
-
-    @Override
-    public void renderTooltip(MatrixStack matrices, Text text, int mouseX, int mouseY) {
-        super.renderTooltip(matrices, text, mouseX, mouseY);
     }
 }

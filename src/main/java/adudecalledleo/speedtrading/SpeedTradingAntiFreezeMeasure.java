@@ -2,6 +2,8 @@ package adudecalledleo.speedtrading;
 
 import net.minecraft.client.MinecraftClient;
 
+import static adudecalledleo.speedtrading.SpeedTradingMod.CONFIG_HOLDER;
+
 public class SpeedTradingAntiFreezeMeasure {
     private static int counter;
 
@@ -10,7 +12,7 @@ public class SpeedTradingAntiFreezeMeasure {
     }
 
     public static int getCounterMax() {
-        return 1;
+        return CONFIG_HOLDER.get().ticksBetweenActions;
     }
 
     public static boolean doAction() {
