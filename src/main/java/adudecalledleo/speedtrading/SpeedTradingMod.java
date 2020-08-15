@@ -18,7 +18,7 @@ public class SpeedTradingMod implements ClientModInitializer {
 
     public static final Logger LOGGER = LoggerUtil.getLogger(MOD_NAME);
     public static final ConfigHolder<ModConfig> CONFIG_HOLDER = ConfigHolder.create(MOD_ID, ModConfig.class,
-            ModConfig::new, ConfigHolder.createExceptionHandler(LOGGER));
+            ModConfig::new, LOGGER);
 
     @Override
     public void onInitializeClient() {
