@@ -5,6 +5,7 @@ import adudecalledleo.speedtrading.config.ModConfig;
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.Logger;
 
@@ -21,6 +22,7 @@ public class SpeedTrading implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         AutoConfig.register(ModConfig.class, JanksonConfigSerializer::new);
+        ClientTickEvents.END_WORLD_TICK.register(SpeedTradeTimer::onClientWorldTick);
         LOGGER.info("Waste your hard-earned emeralds with ease!");
     }
 }

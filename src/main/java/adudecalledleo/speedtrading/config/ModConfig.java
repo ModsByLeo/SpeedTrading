@@ -15,8 +15,9 @@ public class ModConfig implements ConfigData {
         return AutoConfig.getConfigHolder(ModConfig.class).getConfig();
     }
 
+    @ConfigEntry.BoundedDiscrete(max = 100, min = 1)
     @ConfigEntry.Gui.Tooltip(count = 2)
-    public int ticksBetweenActions = 5;
+    public int ticksBetweenActions = 1;
 
     public enum TradeBlockBehavior implements SelectionListEntry.Translatable {
         DAMAGEABLE, UNSTACKABLE, DISABLED;
