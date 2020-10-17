@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "speedtrading",
+  "version": "${version}",
+  "name": "Speed Trading",
+  "description": "Adds a button to the villager trading GUI to repeat the current trade until it's no longer available.",
+  "authors": [
+    "ADudeCalledLeo"
+  ],
+  "contact": {
+    "homepage": "https://curseforge.com/minecraft/mc-mods/speed-trading",
+    "sources": "https://github.com/Leo40Git/SpeedTrading"
+  },
+  "license": "MIT",
+  "icon": "assets/speedtrading/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "adudecalledleo.speedtrading.SpeedTrading"
+    ],
+    "modmenu": [
+      "adudecalledleo.speedtrading.compat.ModMenuSupport"
+    ]
+  },
+  "mixins": [
+    "speedtrading.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.10.1+build.209",
+    "fabric": "*",
+    "minecraft": "~1.16.3"
+  },
+  "suggests": {
+    "modupdater": "*"
+  },
+  "custom": {
+    "modupdater": {
+      "strategy": "curseforge",
+      "projectID": 391016
+    }
+  }
+}
