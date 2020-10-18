@@ -9,6 +9,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.MerchantScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.Text;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOfferList;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,6 +18,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.List;
 
 import static adudecalledleo.speedtrading.util.PlayerInventoryUtil.playerCanAcceptStack;
 import static adudecalledleo.speedtrading.util.PlayerInventoryUtil.playerHasStack;
@@ -99,6 +102,11 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
     public void clearSellSlots() {
         onMouseClick(handler.slots.get(0), -1, 0, SlotActionType.QUICK_MOVE);
         onMouseClick(handler.slots.get(1), -1, 0, SlotActionType.QUICK_MOVE);
+    }
+
+    @Override
+    public void callRenderTooltip(MatrixStack matrixStack, List<Text> text, int mouseX, int mouseY) {
+        renderTooltip(matrixStack, text, mouseX, mouseY);
     }
 
     @Override

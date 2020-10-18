@@ -18,5 +18,5 @@ public interface MerchantScreenHooks {
     void performTrade();
     void clearSellSlots();
 
-    void renderTooltip(MatrixStack matrixStack, List<Text> text, int mouseX, int mouseY);
+    void callRenderTooltip(MatrixStack matrixStack, List<Text> text, int mouseX, int mouseY);
 }

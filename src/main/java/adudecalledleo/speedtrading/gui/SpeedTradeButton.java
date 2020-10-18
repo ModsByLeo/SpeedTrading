@@ -113,7 +113,7 @@ public class SpeedTradeButton extends AbstractPressableButtonWidget implements T
             }
             appendTradeDescription(hooks.getCurrentTradeOffer(), textList);
         }
-        hooks.renderTooltip(matrices, textList, mouseX, mouseY);
+        hooks.callRenderTooltip(matrices, textList, mouseX, mouseY);
     }
 
     private static final Style STYLE_GRAY = Style.EMPTY.withColor(Formatting.GRAY);
@@ -130,11 +130,11 @@ public class SpeedTradeButton extends AbstractPressableButtonWidget implements T
         destList.add(createItemStackDescription(originalFirstBuyItem, adjustedFirstBuyItem)
                 .fillStyle(STYLE_GRAY));
         if (!secondBuyItem.isEmpty())
-            destList.add(new TranslatableText("speedtrading.tooltip.current_trade.and")
-                    .append(createItemStackDescription(secondBuyItem))
+            destList.add(new TranslatableText("speedtrading.tooltip.current_trade.and",
+                    createItemStackDescription(secondBuyItem))
                     .fillStyle(STYLE_GRAY));
-        destList.add(new TranslatableText("speedtrading.tooltip.current_trade.for")
-                .append(createItemStackDescription(sellItem))
+        destList.add(new TranslatableText("speedtrading.tooltip.current_trade.for",
+                createItemStackDescription(sellItem))
                 .fillStyle(STYLE_GRAY));
     }
 
