@@ -33,11 +33,17 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
 
     @Shadow protected abstract void syncRecipeIndex();
 
+    @Unique private PlayerInventory playerInventory;
     @Unique private SpeedTradeButton speedTradeButton;
 
     public MerchantScreenMixin() {
         super(null, null, null);
         throw new RuntimeException("Mixin constructor called?!");
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void capturePlayerInventory(MerchantScreenHandler handler, PlayerInventory inventory, Text title, CallbackInfo ci) {
+        this.playerInventory = inventory;
     }
 
     @Inject(method = "init", at = @At("TAIL"))
@@ -74,10 +80,6 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
             return State.CAN_PERFORM;
         if (offer.isDisabled())
             return State.OUT_OF_STOCK;
-
-        // FIXME there has to be a better way to do this...
-        PlayerInventory playerInventory = client.player.getInventory();
-
         if (!playerCanAcceptStack(playerInventory, sellItem))
             return State.NO_ROOM_FOR_SELL_ITEM;
         if (playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory, offer.getSecondBuyItem()))
