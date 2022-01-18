@@ -1,17 +1,10 @@
 package adudecalledleo.speedtrading.mixin;
 
+import java.util.List;
+
 import adudecalledleo.speedtrading.config.ModConfig;
 import adudecalledleo.speedtrading.duck.MerchantScreenHooks;
 import adudecalledleo.speedtrading.gui.SpeedTradeButton;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.MerchantScreen;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.MerchantScreenHandler;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.Text;
-import net.minecraft.village.TradeOffer;
-import net.minecraft.village.TradeOfferList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -19,7 +12,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.MerchantScreen;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.MerchantScreenHandler;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.Text;
+import net.minecraft.village.TradeOffer;
+import net.minecraft.village.TradeOfferList;
 
 import static adudecalledleo.speedtrading.util.PlayerInventoryUtil.playerCanAcceptStack;
 import static adudecalledleo.speedtrading.util.PlayerInventoryUtil.playerHasStack;
@@ -40,12 +42,12 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
 
     @Inject(method = "init", at = @At("TAIL"))
     public void addSpeedTradeButton(CallbackInfo ci) {
-        addButton(speedTradeButton = new SpeedTradeButton(x + 247, y + 36, this));
+        addDrawableChild(speedTradeButton = new SpeedTradeButton(x + 247, y + 36, this));
     }
 
     @Inject(method = "render", at = @At("TAIL"))
     public void renderSpeedTradeButtonTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        speedTradeButton.renderToolTip(matrices, mouseX, mouseY);
+        speedTradeButton.renderTooltip(matrices, mouseX, mouseY);
     }
 
     @Override
@@ -55,7 +57,7 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
         TradeOffer offer = getCurrentTradeOffer();
         if (offer == null)
             return State.NO_SELECTION;
-        ItemStack sellItem = offer.getMutableSellItem();
+        ItemStack sellItem = offer.getSellItem();
         ModConfig.TradeBlockBehavior tradeBlockBehavior = ModConfig.get().tradeBlockBehavior;
         switch (tradeBlockBehavior) {
         case DAMAGEABLE:
@@ -72,6 +74,10 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
             return State.CAN_PERFORM;
         if (offer.isDisabled())
             return State.OUT_OF_STOCK;
+
+        // FIXME there has to be a better way to do this...
+        PlayerInventory playerInventory = client.player.getInventory();
+
         if (!playerCanAcceptStack(playerInventory, sellItem))
             return State.NO_ROOM_FOR_SELL_ITEM;
         if (playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory, offer.getSecondBuyItem()))
@@ -110,8 +116,8 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
     }
 
     @Override
-    public void tick() {
-        super.tick();
+    protected void handledScreenTick() {
+        super.handledScreenTick();
         speedTradeButton.tick();
     }
 }

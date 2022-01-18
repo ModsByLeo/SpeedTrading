@@ -1,23 +1,24 @@
 package adudecalledleo.speedtrading.gui;
 
+import java.util.ArrayList;
+import java.util.Locale;
+
 import adudecalledleo.speedtrading.SpeedTradeTimer;
 import adudecalledleo.speedtrading.SpeedTrading;
 import adudecalledleo.speedtrading.duck.MerchantScreenHooks;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
+
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.widget.PressableWidget;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Tickable;
 import net.minecraft.village.TradeOffer;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
-public class SpeedTradeButton extends AbstractPressableButtonWidget implements Tickable {
+public class SpeedTradeButton extends PressableWidget {
     private static final int PHASE_INACTIVE = 0;
     private static final int PHASE_AUTOFILL = 1;
     private static final int PHASE_PERFORM = 2;
@@ -48,7 +49,6 @@ public class SpeedTradeButton extends AbstractPressableButtonWidget implements T
         return true;
     }
 
-    @Override
     public void tick() {
         if (phase > PHASE_INACTIVE) {
             if (SpeedTradeTimer.doAction()) {
@@ -72,23 +72,19 @@ public class SpeedTradeButton extends AbstractPressableButtonWidget implements T
 
     private static final Identifier BUTTON_LOCATION = SpeedTrading.id("textures/gui/speedtrade.png");
 
-    @SuppressWarnings("deprecation")
     @Override
     public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        MinecraftClient minecraftClient = MinecraftClient.getInstance();
-        minecraftClient.getTextureManager().bindTexture(BUTTON_LOCATION);
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.enableDepthTest();
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, BUTTON_LOCATION);
         int v = 36;
-        if (phase == PHASE_INACTIVE && hooks.getState() == MerchantScreenHooks.State.CAN_PERFORM)
+        if (phase == PHASE_INACTIVE && hooks.getState() == MerchantScreenHooks.State.CAN_PERFORM) {
             v = isHovered() ? 18 : 0;
+        }
         drawTexture(matrices, x, y, 0, v, 20, 18, 20, 54);
     }
 
     @Override
-    public void renderToolTip(MatrixStack matrices, int mouseX, int mouseY) {
+    public void renderTooltip(MatrixStack matrices, int mouseX, int mouseY) {
         if (!isHovered())
             return;
         ArrayList<Text> textList = new ArrayList<>();
@@ -124,7 +120,7 @@ public class SpeedTradeButton extends AbstractPressableButtonWidget implements T
         ItemStack originalFirstBuyItem = offer.getOriginalFirstBuyItem();
         ItemStack adjustedFirstBuyItem = offer.getAdjustedFirstBuyItem();
         ItemStack secondBuyItem = offer.getSecondBuyItem();
-        ItemStack sellItem = offer.getMutableSellItem();
+        ItemStack sellItem = offer.getSellItem();
         destList.add(new TranslatableText("speedtrading.tooltip.current_trade.is")
                 .styled(style -> style.withColor(Formatting.GRAY)));
         destList.add(createItemStackDescription(originalFirstBuyItem, adjustedFirstBuyItem)
@@ -159,4 +155,7 @@ public class SpeedTradeButton extends AbstractPressableButtonWidget implements T
     private MutableText getItemStackName(ItemStack stack) {
         return Texts.bracketed(new LiteralText("").append(stack.getName()).styled(style -> style.withFormatting(stack.getRarity().formatting)));
     }
+
+    @Override
+    public void appendNarrations(NarrationMessageBuilder builder) { }
 }

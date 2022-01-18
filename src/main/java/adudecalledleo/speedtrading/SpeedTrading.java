@@ -1,19 +1,20 @@
 package adudecalledleo.speedtrading;
 
-import adudecalledleo.lionutils.LoggerUtil;
 import adudecalledleo.speedtrading.config.ModConfig;
-import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
-import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.util.Identifier;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import net.minecraft.util.Identifier;
 
 public class SpeedTrading implements ClientModInitializer {
     public static final String MOD_ID = "speedtrading";
     public static final String MOD_NAME = "Speed Trading";
 
-    public static final Logger LOGGER = LoggerUtil.getLogger(MOD_NAME);
+    public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 
     public static Identifier id(String path) {
         return new Identifier(MOD_ID, path);

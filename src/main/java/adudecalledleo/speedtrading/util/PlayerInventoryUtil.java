@@ -8,7 +8,7 @@ import net.minecraft.util.collection.DefaultedList;
 public class PlayerInventoryUtil {
     public static boolean areItemsEqual(ItemStack a, ItemStack b) {
         return ItemStack.areItemsEqualIgnoreDamage(a, b) &&
-                (!a.hasTag() || b.hasTag() && NbtHelper.matches(b.getTag(), a.getTag(), false));
+                (!a.hasNbt() || b.hasNbt() && NbtHelper.matches(b.getNbt(), a.getNbt(), false));
     }
 
     public static boolean listContainsStack(DefaultedList<ItemStack> list, ItemStack stack) {

@@ -1,13 +1,14 @@
 package adudecalledleo.speedtrading.config;
 
-import adudecalledleo.speedtrading.SpeedTrading;
-import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
-import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
-import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
-import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
-import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
-
 import java.util.Locale;
+
+import adudecalledleo.speedtrading.SpeedTrading;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.Config;
+import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
+import org.jetbrains.annotations.NotNull;
 
 @Config(name = SpeedTrading.MOD_ID)
 public class ModConfig implements ConfigData {
@@ -23,7 +24,7 @@ public class ModConfig implements ConfigData {
         DAMAGEABLE, UNSTACKABLE, DISABLED;
 
         @Override
-        public String getKey() {
+        public @NotNull String getKey() {
             return "text.autoconfig.speedtrading.option.tradeBlockBehavior." + this.name().toLowerCase(Locale.ROOT);
         }
     }
