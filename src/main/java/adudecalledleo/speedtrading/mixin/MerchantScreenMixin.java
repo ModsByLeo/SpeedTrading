@@ -18,6 +18,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.MerchantScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.village.TradeOffer;
@@ -57,10 +58,10 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
     }
 
     @Override
-    public State getState() {
+    public State speedtrading$computeState() {
         if (client == null || client.currentScreen != this)
             return State.CLOSED;
-        TradeOffer offer = getCurrentTradeOffer();
+        TradeOffer offer = speedtrading$getCurrentTradeOffer();
         if (offer == null)
             return State.NO_SELECTION;
         if (offer.isDisabled())
@@ -76,7 +77,7 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
     }
 
     @Override
-    public TradeOffer getCurrentTradeOffer() {
+    public TradeOffer speedtrading$getCurrentTradeOffer() {
         TradeOfferList tradeOffers = handler.getRecipes();
         if (selectedIndex < 0 || selectedIndex >= tradeOffers.size())
             return null;
@@ -84,24 +85,25 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
     }
 
     @Override
-    public void autofillSellSlots() {
+    public void speedtrading$autofillSellSlots() {
         syncRecipeIndex();
     }
 
     @Override
-    public void performTrade() {
-        if (getState() == State.CAN_PERFORM)
-            onMouseClick(handler.slots.get(2), -1, 0, SlotActionType.QUICK_MOVE);
+    public void speedtrading$performTrade() {
+        Slot resultSlot = handler.getSlot(2);
+        if (!resultSlot.getStack().isEmpty())
+            onMouseClick(resultSlot, -1, 0, SlotActionType.QUICK_MOVE);
     }
 
     @Override
-    public void clearSellSlots() {
-        onMouseClick(handler.slots.get(0), -1, 0, SlotActionType.QUICK_MOVE);
-        onMouseClick(handler.slots.get(1), -1, 0, SlotActionType.QUICK_MOVE);
+    public void speedtrading$clearSellSlots() {
+        onMouseClick(null, 0, 0, SlotActionType.QUICK_MOVE);
+        onMouseClick(null, 1, 0, SlotActionType.QUICK_MOVE);
     }
 
     @Override
-    public void callRenderTooltip(MatrixStack matrixStack, List<Text> text, int mouseX, int mouseY) {
+    public void speedtrading$callRenderTooltip(MatrixStack matrixStack, List<Text> text, int mouseX, int mouseY) {
         renderTooltip(matrixStack, text, mouseX, mouseY);
     }
 

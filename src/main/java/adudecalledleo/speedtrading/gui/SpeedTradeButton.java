@@ -34,16 +34,16 @@ public class SpeedTradeButton extends PressableWidget {
 
     @Override
     public void onPress() {
-        if (phase == PHASE_INACTIVE && hooks.getState() == MerchantScreenHooks.State.CAN_PERFORM) {
+        if (phase == PHASE_INACTIVE && hooks.speedtrading$computeState() == MerchantScreenHooks.State.CAN_PERFORM) {
             phase++;
             SpeedTradeTimer.reset();
         }
     }
 
     private boolean checkState() {
-        if (hooks.getState() != MerchantScreenHooks.State.CAN_PERFORM) {
+        if (hooks.speedtrading$computeState() != MerchantScreenHooks.State.CAN_PERFORM) {
             phase = PHASE_INACTIVE;
-            hooks.clearSellSlots();
+            hooks.speedtrading$clearSellSlots();
             return false;
         }
         return true;
@@ -56,11 +56,11 @@ public class SpeedTradeButton extends PressableWidget {
                     return;
                 switch (phase) {
                 case PHASE_AUTOFILL:
-                    hooks.autofillSellSlots();
+                    hooks.speedtrading$autofillSellSlots();
                     phase++;
                     break;
                 case PHASE_PERFORM:
-                    hooks.performTrade();
+                    hooks.speedtrading$performTrade();
                 default:
                     phase = PHASE_AUTOFILL;
                     break;
@@ -77,7 +77,7 @@ public class SpeedTradeButton extends PressableWidget {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, BUTTON_LOCATION);
         int v = 36;
-        if (phase == PHASE_INACTIVE && hooks.getState() == MerchantScreenHooks.State.CAN_PERFORM) {
+        if (phase == PHASE_INACTIVE && hooks.speedtrading$computeState() == MerchantScreenHooks.State.CAN_PERFORM) {
             v = isHovered() ? 18 : 0;
         }
         drawTexture(matrices, x, y, 0, v, 20, 18, 20, 54);
@@ -93,7 +93,7 @@ public class SpeedTradeButton extends PressableWidget {
                     style -> style.withFormatting(Formatting.BOLD, Formatting.ITALIC, Formatting.DARK_GREEN)
             ));
         } else {
-            MerchantScreenHooks.State state = hooks.getState();
+            MerchantScreenHooks.State state = hooks.speedtrading$computeState();
             if (state == MerchantScreenHooks.State.CAN_PERFORM) {
                 textList.add(new TranslatableText("speedtrading.tooltip.can_perform").styled(
                         style -> style.withFormatting(Formatting.BOLD, Formatting.GREEN)
@@ -107,9 +107,9 @@ public class SpeedTradeButton extends PressableWidget {
                                 style -> style.withFormatting(Formatting.ITALIC, Formatting.GRAY)
                         ));
             }
-            appendTradeDescription(hooks.getCurrentTradeOffer(), textList);
+            appendTradeDescription(hooks.speedtrading$getCurrentTradeOffer(), textList);
         }
-        hooks.callRenderTooltip(matrices, textList, mouseX, mouseY);
+        hooks.speedtrading$callRenderTooltip(matrices, textList, mouseX, mouseY);
     }
 
     private static final Style STYLE_GRAY = Style.EMPTY.withColor(Formatting.GRAY);
