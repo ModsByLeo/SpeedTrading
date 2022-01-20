@@ -4,6 +4,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.village.TradeOffer;
 
 public class PlayerInventoryUtil {
     public static boolean areItemsEqual(ItemStack a, ItemStack b) {
@@ -24,6 +25,10 @@ public class PlayerInventoryUtil {
 
     public static boolean playerHasStack(PlayerInventory playerInventory, ItemStack stack) {
         return listContainsStack(playerInventory.main, stack);
+    }
+
+    public static boolean playerCanPerformTrade(PlayerInventory playerInventory, TradeOffer offer) {
+        return playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory, offer.getSecondBuyItem());
     }
 
     public static boolean playerCanAcceptStack(PlayerInventory playerInventory, ItemStack stack) {

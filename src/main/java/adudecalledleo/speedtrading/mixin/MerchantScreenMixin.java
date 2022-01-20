@@ -24,7 +24,7 @@ import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOfferList;
 
 import static adudecalledleo.speedtrading.util.PlayerInventoryUtil.playerCanAcceptStack;
-import static adudecalledleo.speedtrading.util.PlayerInventoryUtil.playerHasStack;
+import static adudecalledleo.speedtrading.util.PlayerInventoryUtil.playerCanPerformTrade;
 
 @Mixin(MerchantScreen.class)
 public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHandler> implements MerchantScreenHooks {
@@ -63,6 +63,8 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
         TradeOffer offer = getCurrentTradeOffer();
         if (offer == null)
             return State.NO_SELECTION;
+        if (offer.isDisabled())
+            return State.OUT_OF_STOCK;
         ItemStack sellItem = offer.getSellItem();
         ModConfig.TradeBlockBehavior tradeBlockBehavior = ModConfig.get().tradeBlockBehavior;
         switch (tradeBlockBehavior) {
@@ -76,13 +78,9 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
         default:
             break;
         }
-        if (handler.getSlot(2).hasStack())
-            return State.CAN_PERFORM;
-        if (offer.isDisabled())
-            return State.OUT_OF_STOCK;
         if (!playerCanAcceptStack(playerInventory, sellItem))
             return State.NO_ROOM_FOR_SELL_ITEM;
-        if (playerHasStack(playerInventory, offer.getAdjustedFirstBuyItem()) && playerHasStack(playerInventory, offer.getSecondBuyItem()))
+        if (handler.getSlot(2).hasStack() || playerCanPerformTrade(playerInventory, offer))
             return State.CAN_PERFORM;
         return State.NOT_ENOUGH_BUY_ITEMS;
     }
