@@ -66,18 +66,8 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
         if (offer.isDisabled())
             return State.OUT_OF_STOCK;
         ItemStack sellItem = offer.getSellItem();
-        ModConfig.TradeBlockBehavior tradeBlockBehavior = ModConfig.get().tradeBlockBehavior;
-        switch (tradeBlockBehavior) {
-        case DAMAGEABLE:
-            if (sellItem.isDamageable())
-                return State.BLOCKED;
-            break;
-        case UNSTACKABLE:
-            if (!sellItem.isStackable())
-                return State.BLOCKED;
-        default:
-            break;
-        }
+        if (ModConfig.get().tradeBlockBehavior.isBlocked(sellItem))
+            return State.BLOCKED;
         if (!playerCanAcceptStack(playerInventory, sellItem))
             return State.NO_ROOM_FOR_SELL_ITEM;
         if (handler.getSlot(2).hasStack() || playerCanPerformTrade(playerInventory, offer))

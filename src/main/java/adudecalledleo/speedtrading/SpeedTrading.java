@@ -1,6 +1,7 @@
 package adudecalledleo.speedtrading;
 
 import adudecalledleo.speedtrading.config.ModConfig;
+import adudecalledleo.speedtrading.config.TradeBlockBehavior;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
@@ -22,6 +23,7 @@ public class SpeedTrading implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        TradeBlockBehavior.registerConfigGuiProvider(ModConfig.class);
         AutoConfig.register(ModConfig.class, JanksonConfigSerializer::new);
         ClientTickEvents.END_WORLD_TICK.register(SpeedTradeTimer::onClientWorldTick);
         LOGGER.info("Waste your hard-earned emeralds with ease!");
