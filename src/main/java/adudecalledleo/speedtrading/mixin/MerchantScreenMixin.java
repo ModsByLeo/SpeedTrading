@@ -67,8 +67,6 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
         if (offer.isDisabled())
             return State.OUT_OF_STOCK;
         ItemStack sellItem = offer.getSellItem();
-        if (ModConfig.get().tradeBlockBehavior.isBlocked(sellItem))
-            return State.BLOCKED;
         if (!playerCanAcceptStack(playerInventory, sellItem))
             return State.NO_ROOM_FOR_SELL_ITEM;
         if (handler.getSlot(2).hasStack() || playerCanPerformTrade(playerInventory, offer))
@@ -82,6 +80,14 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
         if (selectedIndex < 0 || selectedIndex >= tradeOffers.size())
             return null;
         return tradeOffers.get(selectedIndex);
+    }
+
+    @Override
+    public boolean speedtrading$isCurrentTradeOfferBlocked() {
+        TradeOffer offer = speedtrading$getCurrentTradeOffer();
+        if (offer == null)
+            return false;
+        return ModConfig.get().tradeBlockBehavior.isBlocked(offer.getSellItem());
     }
 
     @Override
@@ -103,8 +109,8 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
     }
 
     @Override
-    public void speedtrading$callRenderTooltip(MatrixStack matrixStack, List<Text> text, int mouseX, int mouseY) {
-        renderTooltip(matrixStack, text, mouseX, mouseY);
+    public void speedtrading$callRenderTooltip(MatrixStack matrices, List<Text> lines, int x, int y) {
+        renderTooltip(matrices, lines, x, y);
     }
 
     @Override

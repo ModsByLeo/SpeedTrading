@@ -3,6 +3,7 @@ package adudecalledleo.speedtrading.gui;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import adudecalledleo.speedtrading.ModKeyBindings;
 import adudecalledleo.speedtrading.SpeedTradeTimer;
 import adudecalledleo.speedtrading.SpeedTrading;
 import adudecalledleo.speedtrading.duck.MerchantScreenHooks;
@@ -18,6 +19,8 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.village.TradeOffer;
 
+import static adudecalledleo.speedtrading.ModKeyBindings.keyOverrideBlock;
+
 public class SpeedTradeButton extends PressableWidget {
     private static final int PHASE_INACTIVE = 0;
     private static final int PHASE_AUTOFILL = 1;
@@ -32,9 +35,15 @@ public class SpeedTradeButton extends PressableWidget {
         phase = PHASE_INACTIVE;
     }
 
+    private boolean isPrimed() {
+        return phase == PHASE_INACTIVE
+                && hooks.speedtrading$computeState() == MerchantScreenHooks.State.CAN_PERFORM
+                && (ModKeyBindings.isDown(keyOverrideBlock) || !hooks.speedtrading$isCurrentTradeOfferBlocked());
+    }
+
     @Override
     public void onPress() {
-        if (phase == PHASE_INACTIVE && hooks.speedtrading$computeState() == MerchantScreenHooks.State.CAN_PERFORM) {
+        if (isPrimed()) {
             phase++;
             SpeedTradeTimer.reset();
         }
@@ -77,7 +86,7 @@ public class SpeedTradeButton extends PressableWidget {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, BUTTON_LOCATION);
         int v = 36;
-        if (phase == PHASE_INACTIVE && hooks.speedtrading$computeState() == MerchantScreenHooks.State.CAN_PERFORM) {
+        if (isPrimed()) {
             v = isHovered() ? 18 : 0;
         }
         drawTexture(matrices, x, y, 0, v, 20, 18, 20, 54);
@@ -95,9 +104,37 @@ public class SpeedTradeButton extends PressableWidget {
         } else {
             MerchantScreenHooks.State state = hooks.speedtrading$computeState();
             if (state == MerchantScreenHooks.State.CAN_PERFORM) {
-                textList.add(new TranslatableText("speedtrading.tooltip.can_perform").styled(
-                        style -> style.withFormatting(Formatting.BOLD, Formatting.GREEN)
-                ));
+                boolean isBlocked = hooks.speedtrading$isCurrentTradeOfferBlocked();
+                boolean isOverriden = ModKeyBindings.isDown(keyOverrideBlock);
+                if (isBlocked && !isOverriden) {
+                    textList.add(new TranslatableText("speedtrading.tooltip.cannot_perform").styled(
+                            style -> style.withFormatting(Formatting.BOLD, Formatting.RED)
+                    ));
+                    textList.add(new TranslatableText("speedtrading.tooltip.blocked").styled(
+                            style -> style.withFormatting(Formatting.ITALIC, Formatting.GRAY)
+                    ));
+                    if (keyOverrideBlock.isUnbound()) {
+                        textList.add(new TranslatableText("speedtrading.tooltip.unblock_hint.unbound[0]",
+                                Texts.bracketed(new TranslatableText(keyOverrideBlock.getTranslationKey())
+                                        .styled(style -> style.withBold(true).withColor(Formatting.WHITE))))
+                                .styled(style -> style.withColor(Formatting.GRAY)));
+                        textList.add(new TranslatableText("speedtrading.tooltip.unblock_hint.unbound[1]")
+                                .styled(style -> style.withColor(Formatting.GRAY)));
+                    } else {
+                        textList.add(new TranslatableText("speedtrading.tooltip.unblock_hint",
+                                Texts.bracketed(new TranslatableText(keyOverrideBlock.getBoundKeyTranslationKey())
+                                        .styled(style -> style.withBold(true).withColor(Formatting.WHITE))))
+                                .styled(style -> style.withColor(Formatting.GRAY)));
+                    }
+                } else {
+                    textList.add(new TranslatableText("speedtrading.tooltip.can_perform").styled(
+                            style -> style.withFormatting(Formatting.BOLD, Formatting.GREEN)
+                    ));
+                    if (isBlocked) {
+                        textList.add(new TranslatableText("speedtrading.tooltip.can_perform.unblock_hint")
+                                .styled(style -> style.withItalic(true).withColor(Formatting.GRAY)));
+                    }
+                }
             } else {
                 textList.add(new TranslatableText("speedtrading.tooltip.cannot_perform").styled(
                         style -> style.withFormatting(Formatting.BOLD, Formatting.RED)
@@ -107,6 +144,7 @@ public class SpeedTradeButton extends PressableWidget {
                                 style -> style.withFormatting(Formatting.ITALIC, Formatting.GRAY)
                         ));
             }
+            textList.add(LiteralText.EMPTY);
             appendTradeDescription(hooks.speedtrading$getCurrentTradeOffer(), textList);
         }
         hooks.speedtrading$callRenderTooltip(matrices, textList, mouseX, mouseY);

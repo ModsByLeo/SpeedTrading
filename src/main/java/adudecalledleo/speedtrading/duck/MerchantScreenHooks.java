@@ -8,15 +8,16 @@ import net.minecraft.village.TradeOffer;
 
 public interface MerchantScreenHooks {
     enum State {
-        CAN_PERFORM, CLOSED, NO_SELECTION, OUT_OF_STOCK, NOT_ENOUGH_BUY_ITEMS, NO_ROOM_FOR_SELL_ITEM, BLOCKED
+        CAN_PERFORM, CLOSED, NO_SELECTION, OUT_OF_STOCK, NOT_ENOUGH_BUY_ITEMS, NO_ROOM_FOR_SELL_ITEM
     }
 
     State speedtrading$computeState();
     TradeOffer speedtrading$getCurrentTradeOffer();
+    boolean speedtrading$isCurrentTradeOfferBlocked();
 
     void speedtrading$autofillSellSlots();
     void speedtrading$performTrade();
     void speedtrading$clearSellSlots();
 
-    void speedtrading$callRenderTooltip(MatrixStack matrixStack, List<Text> text, int mouseX, int mouseY);
+    void speedtrading$callRenderTooltip(MatrixStack matrices, List<Text> lines, int x, int y);
 }

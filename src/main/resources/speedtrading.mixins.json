@@ -3,8 +3,12 @@
   "minVersion": "0.8",
   "package": "adudecalledleo.speedtrading.mixin",
   "compatibilityLevel": "JAVA_16",
-  "client": [
-    "MerchantScreenMixin"
+  "mixins": [
+    "HandledScreenAccessor",
+    "KeyBindingAccessor",
+    "KeyboardMixin",
+    "MerchantScreenMixin",
+    "MouseMixin"
   ],
   "injectors": {
     "defaultRequire": 1

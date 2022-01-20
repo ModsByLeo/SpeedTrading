@@ -25,6 +25,7 @@ public class SpeedTrading implements ClientModInitializer {
     public void onInitializeClient() {
         TradeBlockBehavior.registerConfigGuiProvider(ModConfig.class);
         AutoConfig.register(ModConfig.class, JanksonConfigSerializer::new);
+        ModKeyBindings.register();
         ClientTickEvents.END_WORLD_TICK.register(SpeedTradeTimer::onClientWorldTick);
         LOGGER.info("Waste your hard-earned emeralds with ease!");
     }
