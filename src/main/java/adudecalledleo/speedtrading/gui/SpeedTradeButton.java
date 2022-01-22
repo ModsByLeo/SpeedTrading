@@ -22,7 +22,7 @@ import net.minecraft.village.TradeOffer;
 import static adudecalledleo.speedtrading.ModKeyBindings.keyOverrideBlock;
 
 public class SpeedTradeButton extends PressableWidget {
-    private static final int PHASE_INACTIVE = 0;
+    private static final int PHASE_NONE = 0;
     private static final int PHASE_AUTOFILL = 1;
     private static final int PHASE_PERFORM = 2;
 
@@ -32,18 +32,19 @@ public class SpeedTradeButton extends PressableWidget {
     public SpeedTradeButton(int x, int y, MerchantScreenHooks hooks) {
         super(x, y, 18, 20, LiteralText.EMPTY);
         this.hooks = hooks;
-        phase = PHASE_INACTIVE;
+        phase = PHASE_NONE;
     }
 
-    private boolean isPrimed() {
-        return phase == PHASE_INACTIVE
+    private boolean checkPrimed() {
+        active = phase == PHASE_NONE
                 && hooks.speedtrading$computeState() == MerchantScreenHooks.State.CAN_PERFORM
                 && (ModKeyBindings.isDown(keyOverrideBlock) || !hooks.speedtrading$isCurrentTradeOfferBlocked());
+        return active;
     }
 
     @Override
     public void onPress() {
-        if (isPrimed()) {
+        if (checkPrimed()) {
             phase++;
             SpeedTradeTimer.reset();
         }
@@ -51,7 +52,7 @@ public class SpeedTradeButton extends PressableWidget {
 
     private boolean checkState() {
         if (hooks.speedtrading$computeState() != MerchantScreenHooks.State.CAN_PERFORM) {
-            phase = PHASE_INACTIVE;
+            phase = PHASE_NONE;
             hooks.speedtrading$clearSellSlots();
             return false;
         }
@@ -59,7 +60,8 @@ public class SpeedTradeButton extends PressableWidget {
     }
 
     public void tick() {
-        if (phase > PHASE_INACTIVE) {
+        if (phase > PHASE_NONE) {
+            active = false;
             if (SpeedTradeTimer.doAction()) {
                 if (!checkState())
                     return;
@@ -76,6 +78,8 @@ public class SpeedTradeButton extends PressableWidget {
                 }
                 checkState();
             }
+        } else {
+            checkPrimed();
         }
     }
 
@@ -85,10 +89,14 @@ public class SpeedTradeButton extends PressableWidget {
     public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, BUTTON_LOCATION);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
         int v = 36;
-        if (isPrimed()) {
+        if (checkPrimed()) {
             v = isHovered() ? 18 : 0;
         }
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableDepthTest();
         drawTexture(matrices, x, y, 0, v, 20, 18, 20, 54);
     }
 
@@ -97,7 +105,7 @@ public class SpeedTradeButton extends PressableWidget {
         if (!isHovered())
             return;
         ArrayList<Text> textList = new ArrayList<>();
-        if (phase > PHASE_INACTIVE) {
+        if (phase > PHASE_NONE) {
             textList.add(new TranslatableText("speedtrading.tooltip.in_progress").styled(
                     style -> style.withFormatting(Formatting.BOLD, Formatting.ITALIC, Formatting.DARK_GREEN)
             ));

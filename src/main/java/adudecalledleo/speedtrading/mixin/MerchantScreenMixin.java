@@ -52,9 +52,10 @@ public abstract class MerchantScreenMixin extends HandledScreen<MerchantScreenHa
         addDrawableChild(speedTradeButton = new SpeedTradeButton(x + 247, y + 36, this));
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
-    public void renderSpeedTradeButtonTooltip(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        speedTradeButton.renderTooltip(matrices, mouseX, mouseY);
+    @Override
+    protected void drawMouseoverTooltip(MatrixStack matrices, int x, int y) {
+        super.drawMouseoverTooltip(matrices, x, y);
+        speedTradeButton.renderTooltip(matrices, x, y);
     }
 
     @Override
