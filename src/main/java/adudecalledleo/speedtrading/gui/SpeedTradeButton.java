@@ -30,7 +30,7 @@ public class SpeedTradeButton extends PressableWidget {
     private int phase;
 
     public SpeedTradeButton(int x, int y, MerchantScreenHooks hooks) {
-        super(x, y, 18, 20, LiteralText.EMPTY);
+        super(x, y, 18, 20, Text.empty());
         this.hooks = hooks;
         phase = PHASE_NONE;
     }
@@ -106,7 +106,7 @@ public class SpeedTradeButton extends PressableWidget {
             return;
         ArrayList<Text> textList = new ArrayList<>();
         if (phase > PHASE_NONE) {
-            textList.add(new TranslatableText("speedtrading.tooltip.in_progress").styled(
+            textList.add(Text.translatable("speedtrading.tooltip.in_progress").styled(
                     style -> style.withFormatting(Formatting.BOLD, Formatting.ITALIC, Formatting.DARK_GREEN)
             ));
         } else {
@@ -115,44 +115,44 @@ public class SpeedTradeButton extends PressableWidget {
                 boolean isBlocked = hooks.speedtrading$isCurrentTradeOfferBlocked();
                 boolean isOverriden = ModKeyBindings.isDown(keyOverrideBlock);
                 if (isBlocked && !isOverriden) {
-                    textList.add(new TranslatableText("speedtrading.tooltip.cannot_perform").styled(
+                    textList.add(Text.translatable("speedtrading.tooltip.cannot_perform").styled(
                             style -> style.withFormatting(Formatting.BOLD, Formatting.RED)
                     ));
-                    textList.add(new TranslatableText("speedtrading.tooltip.blocked").styled(
+                    textList.add(Text.translatable("speedtrading.tooltip.blocked").styled(
                             style -> style.withFormatting(Formatting.ITALIC, Formatting.GRAY)
                     ));
                     if (keyOverrideBlock.isUnbound()) {
-                        textList.add(new TranslatableText("speedtrading.tooltip.unblock_hint.unbound[0]",
-                                Texts.bracketed(new TranslatableText(keyOverrideBlock.getTranslationKey())
+                        textList.add(Text.translatable("speedtrading.tooltip.unblock_hint.unbound[0]",
+                                Texts.bracketed(Text.translatable(keyOverrideBlock.getTranslationKey())
                                         .styled(style -> style.withBold(true).withColor(Formatting.WHITE))))
                                 .styled(style -> style.withColor(Formatting.GRAY)));
-                        textList.add(new TranslatableText("speedtrading.tooltip.unblock_hint.unbound[1]")
+                        textList.add(Text.translatable("speedtrading.tooltip.unblock_hint.unbound[1]")
                                 .styled(style -> style.withColor(Formatting.GRAY)));
                     } else {
-                        textList.add(new TranslatableText("speedtrading.tooltip.unblock_hint",
-                                Texts.bracketed(new TranslatableText(keyOverrideBlock.getBoundKeyTranslationKey())
+                        textList.add(Text.translatable("speedtrading.tooltip.unblock_hint",
+                                Texts.bracketed(Text.translatable(keyOverrideBlock.getBoundKeyTranslationKey())
                                         .styled(style -> style.withBold(true).withColor(Formatting.WHITE))))
                                 .styled(style -> style.withColor(Formatting.GRAY)));
                     }
                 } else {
-                    textList.add(new TranslatableText("speedtrading.tooltip.can_perform").styled(
+                    textList.add(Text.translatable("speedtrading.tooltip.can_perform").styled(
                             style -> style.withFormatting(Formatting.BOLD, Formatting.GREEN)
                     ));
                     if (isBlocked) {
-                        textList.add(new TranslatableText("speedtrading.tooltip.can_perform.unblock_hint")
+                        textList.add(Text.translatable("speedtrading.tooltip.can_perform.unblock_hint")
                                 .styled(style -> style.withItalic(true).withColor(Formatting.GRAY)));
                     }
                 }
             } else {
-                textList.add(new TranslatableText("speedtrading.tooltip.cannot_perform").styled(
+                textList.add(Text.translatable("speedtrading.tooltip.cannot_perform").styled(
                         style -> style.withFormatting(Formatting.BOLD, Formatting.RED)
                 ));
                 textList.add(
-                        new TranslatableText("speedtrading.tooltip." + state.name().toLowerCase(Locale.ROOT)).styled(
+                        Text.translatable("speedtrading.tooltip." + state.name().toLowerCase(Locale.ROOT)).styled(
                                 style -> style.withFormatting(Formatting.ITALIC, Formatting.GRAY)
                         ));
             }
-            textList.add(LiteralText.EMPTY);
+            textList.add(Text.empty());
             appendTradeDescription(hooks.speedtrading$getCurrentTradeOffer(), textList);
         }
         hooks.speedtrading$callRenderTooltip(matrices, textList, mouseX, mouseY);
@@ -167,15 +167,15 @@ public class SpeedTradeButton extends PressableWidget {
         ItemStack adjustedFirstBuyItem = offer.getAdjustedFirstBuyItem();
         ItemStack secondBuyItem = offer.getSecondBuyItem();
         ItemStack sellItem = offer.getSellItem();
-        destList.add(new TranslatableText("speedtrading.tooltip.current_trade.is")
+        destList.add(Text.translatable("speedtrading.tooltip.current_trade.is")
                 .styled(style -> style.withColor(Formatting.GRAY)));
         destList.add(createItemStackDescription(originalFirstBuyItem, adjustedFirstBuyItem)
                 .fillStyle(STYLE_GRAY));
         if (!secondBuyItem.isEmpty())
-            destList.add(new TranslatableText("speedtrading.tooltip.current_trade.and",
+            destList.add(Text.translatable("speedtrading.tooltip.current_trade.and",
                     createItemStackDescription(secondBuyItem))
                     .fillStyle(STYLE_GRAY));
-        destList.add(new TranslatableText("speedtrading.tooltip.current_trade.for",
+        destList.add(Text.translatable("speedtrading.tooltip.current_trade.for",
                 createItemStackDescription(sellItem))
                 .fillStyle(STYLE_GRAY));
     }
@@ -185,21 +185,21 @@ public class SpeedTradeButton extends PressableWidget {
             return createItemStackDescription(stack);
         else {
             return getItemStackName(stack)
-                    .append(new LiteralText(" "))
-                    .append(new LiteralText("x" + stack.getCount())
+                    .append(Text.literal(" "))
+                    .append(Text.literal("x" + stack.getCount())
                             .styled(style -> style.withFormatting(Formatting.STRIKETHROUGH, Formatting.RED)))
-                    .append(new LiteralText(" x" + adjustedStack.getCount())
+                    .append(Text.literal(" x" + adjustedStack.getCount())
                             .styled(style -> style.withFormatting(Formatting.BOLD, Formatting.GREEN)));
         }
     }
 
     private MutableText createItemStackDescription(ItemStack stack) {
         return getItemStackName(stack)
-                .append(new LiteralText(" x" + stack.getCount()));
+                .append(Text.literal(" x" + stack.getCount()));
     }
 
     private MutableText getItemStackName(ItemStack stack) {
-        return Texts.bracketed(new LiteralText("").append(stack.getName()).styled(style -> style.withFormatting(stack.getRarity().formatting)));
+        return Texts.bracketed(Text.literal("").append(stack.getName()).styled(style -> style.withFormatting(stack.getRarity().formatting)));
     }
 
     @Override

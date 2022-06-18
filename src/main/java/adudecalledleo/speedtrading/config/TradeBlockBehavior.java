@@ -10,7 +10,6 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 import static me.shedaniel.autoconfig.util.Utils.getUnsafely;
@@ -29,7 +28,7 @@ public enum TradeBlockBehavior {
 
     public Text toText() {
         MutableText text
-                = new TranslatableText("text.autoconfig.speedtrading.option.tradeBlockBehavior." + this.name().toLowerCase(Locale.ROOT));
+                = Text.translatable("text.autoconfig.speedtrading.option.tradeBlockBehavior." + this.name().toLowerCase(Locale.ROOT));
         if (this == DISABLED)
             text = text.styled(style -> style.withColor(Formatting.RED));
         return text;
@@ -42,7 +41,7 @@ public enum TradeBlockBehavior {
         AutoConfig.getGuiRegistry(configClass).registerTypeProvider((i13n, field, config, defaults, registry) ->
                 Collections.singletonList(
                         entryBuilder.startSelector(
-                                        new TranslatableText(i13n),
+                                        Text.translatable(i13n),
                                         VALUES,
                                         getUnsafely(field, config, getUnsafely(field, defaults)))
                                 .setDefaultValue(() -> getUnsafely(field, defaults))
